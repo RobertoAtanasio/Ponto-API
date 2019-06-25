@@ -37,4 +37,5 @@ public interface FuncionarioService {
 	 * @return Optional<Funcionario>
 	 */
 	Optional<Funcionario> buscarPorId(Long id);
+	
 }
