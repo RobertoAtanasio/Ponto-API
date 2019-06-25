@@ -32,7 +32,8 @@ public class LancamentoServiceImpl implements LancamentoService {
 	public Optional<Lancamento> buscarPorId(Long id) {
 		log.info("Buscando um lançamento pelo ID {}", id);
 		Optional<Lancamento> lancamento = this.lancamentoRepository.findById(id);
-		return Optional.ofNullable(lancamento.get());
+		return lancamento;
+//		return Optional.ofNullable(lancamento.get());
 	}
 	
 	@CachePut("lancamentoPorId")

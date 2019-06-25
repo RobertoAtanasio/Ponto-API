@@ -43,5 +43,5 @@ public class FuncionarioServiceImpl implements FuncionarioService{
 		Optional<Funcionario> funcionario = this.funcionarioRepository.findById(id);
 		return Optional.ofNullable(funcionario.get());
 	}
-
+	
 }
