@@ -15,8 +15,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import com.rapl.ponto.api.enums.TipoEnum;
 
@@ -31,7 +29,6 @@ public class Lancamento implements Serializable {
 	@Column(name = "id")
 	private Long id;
 	
-	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "data", nullable = false)
 	private LocalDateTime data;
 	
