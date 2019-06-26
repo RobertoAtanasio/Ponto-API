@@ -45,14 +45,24 @@ public class EmpresaController {
 		Optional<Empresa> empresa = empresaService.buscarPorCnpj(cnpj);
 
 		if (!empresa.isPresent()) {
-			String mensagem = messageSource.getMessage("erro.empresa-nao-encontrada", null, LocaleContextHolder.getLocale());
-			log.info(mensagem + " {}", cnpj);
+			String mensagem = obterMensagem("erro.empresa-nao-encontrada");
+			log.info(mensagem, cnpj);
 			response.getErrors().add(mensagem + " " + cnpj);
 			return ResponseEntity.badRequest().body(response);
 		}
 
 		response.setData(this.converterEmpresaDto(empresa.get()));
 		return ResponseEntity.ok(response);
+	}
+
+	/**
+	 * Obter a mensagem de erro definida no messages.properties
+	 * 
+	 * @param codigoMensagem
+	 * @return String
+	 */
+	private String obterMensagem(String codigoMensagem) {
+		return messageSource.getMessage(codigoMensagem, null, LocaleContextHolder.getLocale());
 	}
 
 	/**

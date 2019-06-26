@@ -8,5 +8,6 @@ public class GerarSenha {
 		
 		BCryptPasswordEncoder bCryptEncoder = new BCryptPasswordEncoder();
 		System.out.println(bCryptEncoder.encode("123456"));
+	
 	}
 }

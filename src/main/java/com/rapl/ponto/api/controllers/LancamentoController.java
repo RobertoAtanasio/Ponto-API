@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
@@ -41,11 +43,14 @@ import com.rapl.ponto.api.services.LancamentoService;
 @RequestMapping("/api/lancamentos")
 @CrossOrigin(origins = "*")
 public class LancamentoController {
-
+	
 	private static final Logger log = LoggerFactory.getLogger(LancamentoController.class);
 //	private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+	@Autowired
+	private MessageSource messageSource;
+	
 	@Autowired
 	private LancamentoService lancamentoService;
 
@@ -70,7 +75,6 @@ public class LancamentoController {
 		log.info("Buscando lançamentos por ID do funcionário: {}, página: {}", funcionarioId, pag);
 		Response<Page<LancamentoDto>> response = new Response<Page<LancamentoDto>>();
 
-//		PageRequest pageRequest = new PageRequest(pag, this.qtdPorPagina, Direction.valueOf(dir), ord);
 		PageRequest pageRequest = PageRequest.of(pag, this.qtdPorPagina, Direction.valueOf(dir), ord);
 		
 		Page<Lancamento> lancamentos = this.lancamentoService.buscarPorFuncionarioId(funcionarioId, pageRequest);
@@ -172,7 +176,8 @@ public class LancamentoController {
 
 		if (!lancamento.isPresent()) {
 			log.info("Erro ao remover devido ao lançamento ID: {} ser inválido.", id);
-			response.getErrors().add("Erro ao remover lançamento. Registro não encontrado para o id " + id);
+			String mensagem = obterMensagem("erro.lancamento.erro-remover-id");
+			response.getErrors().add(mensagem + " " + id);
 			return ResponseEntity.badRequest().body(response);
 		}
 
@@ -189,14 +194,16 @@ public class LancamentoController {
 	 */
 	private void validarFuncionario(LancamentoDto lancamentoDto, BindingResult result) {
 		if (lancamentoDto.getFuncionarioId() == null) {
-			result.addError(new ObjectError("funcionario", "Funcionário não informado."));
+			String mensagem = obterMensagem("erro.lancamento.funcionario-nao-informado");
+			result.addError(new ObjectError("funcionario", mensagem));
 			return;
 		}
 
 		log.info("Validando funcionário id {}: ", lancamentoDto.getFuncionarioId());
 		Optional<Funcionario> funcionario = this.funcionarioService.buscarPorId(lancamentoDto.getFuncionarioId());
 		if (!funcionario.isPresent()) {
-			result.addError(new ObjectError("funcionario", "Funcionário não encontrado. ID inexistente."));
+			String mensagem = obterMensagem("erro.lancamento.funcionario-nao-encontrado");
+			result.addError(new ObjectError("funcionario", mensagem));
 		}
 	}
 
@@ -234,7 +241,8 @@ public class LancamentoController {
 			if (lanc.isPresent()) {
 				lancamento = lanc.get();
 			} else {
-				result.addError(new ObjectError("lancamento", "Lançamento não encontrado."));
+				String mensagem = obterMensagem("erro.lancamento.nao-encontrado");
+				result.addError(new ObjectError("lancamento", mensagem));
 			}
 		} else {
 			lancamento.setFuncionario(new Funcionario());
@@ -247,6 +255,7 @@ public class LancamentoController {
 //		lancamento.setData(this.dateFormat.parse(lancamentoDto.getData()));
 		lancamento.setData(LocalDateTime.parse(lancamentoDto.getData(), dateFormat));
 	
+		// EnumUtils: ver dependência commons-lang3 no pom.xml
 		if (EnumUtils.isValidEnum(TipoEnum.class, lancamentoDto.getTipo())) {
 			lancamento.setTipo(TipoEnum.valueOf(lancamentoDto.getTipo()));
 		} else {
@@ -254,5 +263,15 @@ public class LancamentoController {
 		}
 
 		return lancamento;
+	}
+	
+	/**
+	 * Obter a mensagem de erro definida no messages.properties
+	 * 
+	 * @param codigoMensagem
+	 * @return String
+	 */
+	private String obterMensagem(String codigoMensagem) {
+		return messageSource.getMessage(codigoMensagem, null, LocaleContextHolder.getLocale());
 	}
 }
