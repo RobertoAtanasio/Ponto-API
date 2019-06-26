@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
@@ -22,7 +24,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.rapl.ponto.api.entities.Empresa;
-import com.rapl.ponto.api.enums.MensagemErro;
 import com.rapl.ponto.api.services.EmpresaService;
 
 @RunWith(SpringRunner.class)
@@ -31,6 +32,9 @@ import com.rapl.ponto.api.services.EmpresaService;
 @ActiveProfiles("test")
 public class EmpresaControllerTest {
 
+	@Autowired
+	private MessageSource messageSource;
+	
 	@Autowired
 	private MockMvc mvc;
 
@@ -47,9 +51,11 @@ public class EmpresaControllerTest {
 	public void testBuscarEmpresaCnpjInvalido() throws Exception {
 		BDDMockito.given(this.empresaService.buscarPorCnpj(Mockito.anyString())).willReturn(Optional.empty());
 
+		String mensagem = messageSource.getMessage("EMPRESA_NAO_ENCONTRADA", null, LocaleContextHolder.getLocale());
+		
 		mvc.perform(MockMvcRequestBuilders.get(BUSCAR_EMPRESA_CNPJ_URL + CNPJ).accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.errors").value(MensagemErro.EMP_NAO_ENCONTRADA.getMensagem() + CNPJ));
+				.andExpect(jsonPath("$.errors").value(mensagem + " " + CNPJ));
 		
 //				.andExpect(jsonPath("$.errors").value("Empresa não encontrada para o CNPJ " + CNPJ));
 		/*

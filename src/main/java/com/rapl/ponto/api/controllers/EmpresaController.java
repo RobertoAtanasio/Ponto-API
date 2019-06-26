@@ -5,6 +5,8 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rapl.ponto.api.dtos.EmpresaDto;
 import com.rapl.ponto.api.entities.Empresa;
-import com.rapl.ponto.api.enums.MensagemErro;
 import com.rapl.ponto.api.response.Response;
 import com.rapl.ponto.api.services.EmpresaService;
 
@@ -24,6 +25,9 @@ import com.rapl.ponto.api.services.EmpresaService;
 public class EmpresaController {
 
 	private static final Logger log = LoggerFactory.getLogger(EmpresaController.class);
+	
+	@Autowired
+	private MessageSource messageSource;
 
 	@Autowired
 	private EmpresaService empresaService;
@@ -41,8 +45,9 @@ public class EmpresaController {
 		Optional<Empresa> empresa = empresaService.buscarPorCnpj(cnpj);
 
 		if (!empresa.isPresent()) {
-			log.info(MensagemErro.EMP_NAO_ENCONTRADA.getMensagem() + "{}", cnpj);
-			response.getErrors().add(MensagemErro.EMP_NAO_ENCONTRADA.getMensagem() + cnpj);
+			String mensagem = messageSource.getMessage("erro.empresa-nao-encontrada", null, LocaleContextHolder.getLocale());
+			log.info(mensagem + " {}", cnpj);
+			response.getErrors().add(mensagem + " " + cnpj);
 			return ResponseEntity.badRequest().body(response);
 		}
 

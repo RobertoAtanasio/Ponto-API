@@ -9,6 +9,8 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
@@ -33,6 +35,9 @@ public class FuncionarioController {
 	private static final Logger log = LoggerFactory.getLogger(FuncionarioController.class);
 
 	@Autowired
+	private MessageSource messageSource;
+	
+	@Autowired
 	private FuncionarioService funcionarioService;
 	
 	/**
@@ -52,7 +57,8 @@ public class FuncionarioController {
 
 		Optional<Funcionario> funcionario = this.funcionarioService.buscarPorId(id);
 		if (!funcionario.isPresent()) {
-			result.addError(new ObjectError("funcionario", "Funcionário não encontrado."));
+			String mensagem = messageSource.getMessage("erro.funcionario-nao-encontrado", null, LocaleContextHolder.getLocale());
+			result.addError(new ObjectError("funcionario", mensagem));
 			result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
 			return ResponseEntity.badRequest().body(response);
 		}
@@ -85,19 +91,22 @@ public class FuncionarioController {
 
 		if (!funcionario.getEmail().equals(funcionarioDto.getEmail())) {
 			this.funcionarioService.buscarPorEmail(funcionarioDto.getEmail())
-					.ifPresent(func -> result.addError(new ObjectError("email", "Email já existente.")));
+			.ifPresent(func -> {
+				String mensagem = messageSource.getMessage("erro.email-ja-existente", null, LocaleContextHolder.getLocale());
+				result.addError(new ObjectError("email", mensagem));
+			});
 			funcionario.setEmail(funcionarioDto.getEmail());
 		}
 
-		funcionario.setQtdHorasAlmoco(null);
+//		funcionario.setQtdHorasAlmoco(null);
 		funcionarioDto.getQtdHorasAlmoco()
 				.ifPresent(qtdHorasAlmoco -> funcionario.setQtdHorasAlmoco(Float.valueOf(qtdHorasAlmoco)));
 
-		funcionario.setQtdHorasTrabalhoDia(null);
+//		funcionario.setQtdHorasTrabalhoDia(null);
 		funcionarioDto.getQtdHorasTrabalhoDia()
 				.ifPresent(qtdHorasTrabDia -> funcionario.setQtdHorasTrabalhoDia(Float.valueOf(qtdHorasTrabDia)));
 
-		funcionario.setValorHora(null);
+//		funcionario.setValorHora(null);
 		funcionarioDto.getValorHora().ifPresent(valorHora -> funcionario.setValorHora(new BigDecimal(valorHora)));
 
 		if (funcionarioDto.getSenha().isPresent()) {
