@@ -1,7 +1,7 @@
 package com.rapl.ponto.api.entities;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -34,10 +34,10 @@ public class Empresa implements Serializable {
 	private String cnpj;
 	
 	@Column(name = "data_criacao", nullable = false)
-	private Date dataCriacao;
+	private LocalDate dataCriacao;
 	
 	@Column(name = "data_atualizacao", nullable = false)
-	private Date dataAtualizacao;
+	private LocalDate dataAtualizacao;
 	
 	@OneToMany(mappedBy = "empresa", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<Funcionario> funcionarios;
@@ -66,19 +66,19 @@ public class Empresa implements Serializable {
 		this.cnpj = cnpj;
 	}
 
-	public Date getDataCriacao() {
+	public LocalDate getDataCriacao() {
 		return dataCriacao;
 	}
 
-	public void setDataCriacao(Date dataCriacao) {
+	public void setDataCriacao(LocalDate dataCriacao) {
 		this.dataCriacao = dataCriacao;
 	}
 
-	public Date getDataAtualizacao() {
+	public LocalDate getDataAtualizacao() {
 		return dataAtualizacao;
 	}
 
-	public void setDataAtualizacao(Date dataAtualizacao) {
+	public void setDataAtualizacao(LocalDate dataAtualizacao) {
 		this.dataAtualizacao = dataAtualizacao;
 	}
 
@@ -92,12 +92,12 @@ public class Empresa implements Serializable {
 	
 	@PreUpdate
     public void preUpdate() {
-        dataAtualizacao = new Date();
+        dataAtualizacao = LocalDate.now();
     }
      
     @PrePersist
     public void prePersist() {
-        final Date atual = new Date();
+        final LocalDate atual = LocalDate.now();
         dataCriacao = atual;
         dataAtualizacao = atual;
     }

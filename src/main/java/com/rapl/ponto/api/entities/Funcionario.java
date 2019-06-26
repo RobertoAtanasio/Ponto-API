@@ -2,7 +2,7 @@ package com.rapl.ponto.api.entities;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,10 +61,10 @@ public class Funcionario implements Serializable {
 	private PerfilEnum perfil;
 	
 	@Column(name = "data_criacao", nullable = false)
-	private LocalDateTime dataCriacao;
+	private LocalDate dataCriacao;
 	
 	@Column(name = "data_atualizacao", nullable = false)
-	private LocalDateTime dataAtualizacao;
+	private LocalDate dataAtualizacao;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Empresa empresa;
@@ -159,19 +159,19 @@ public class Funcionario implements Serializable {
 		this.perfil = perfil;
 	}
 
-	public LocalDateTime getDataCriacao() {
+	public LocalDate getDataCriacao() {
 		return dataCriacao;
 	}
 
-	public void setDataCriacao(LocalDateTime dataCriacao) {
+	public void setDataCriacao(LocalDate dataCriacao) {
 		this.dataCriacao = dataCriacao;
 	}
 
-	public LocalDateTime getDataAtualizacao() {
+	public LocalDate getDataAtualizacao() {
 		return dataAtualizacao;
 	}
 
-	public void setDataAtualizacao(LocalDateTime dataAtualizacao) {
+	public void setDataAtualizacao(LocalDate dataAtualizacao) {
 		this.dataAtualizacao = dataAtualizacao;
 	}
 
@@ -193,12 +193,12 @@ public class Funcionario implements Serializable {
 	
 	@PreUpdate
     public void preUpdate() {
-        dataAtualizacao = LocalDateTime.now();
+        dataAtualizacao = LocalDate.now();
     }
      
     @PrePersist
     public void prePersist() {
-    	LocalDateTime atual = LocalDateTime.now();
+    	LocalDate atual = LocalDate.now();
         dataCriacao = atual;
         dataAtualizacao = atual;
     }

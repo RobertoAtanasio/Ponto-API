@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rapl.ponto.api.dtos.EmpresaDto;
 import com.rapl.ponto.api.entities.Empresa;
+import com.rapl.ponto.api.enums.MensagemErro;
 import com.rapl.ponto.api.response.Response;
 import com.rapl.ponto.api.services.EmpresaService;
 
@@ -40,8 +41,8 @@ public class EmpresaController {
 		Optional<Empresa> empresa = empresaService.buscarPorCnpj(cnpj);
 
 		if (!empresa.isPresent()) {
-			log.info("Empresa não encontrada para o CNPJ: {}", cnpj);
-			response.getErrors().add("Empresa não encontrada para o CNPJ " + cnpj);
+			log.info(MensagemErro.EMP_NAO_ENCONTRADA.getMensagem() + "{}", cnpj);
+			response.getErrors().add(MensagemErro.EMP_NAO_ENCONTRADA.getMensagem() + cnpj);
 			return ResponseEntity.badRequest().body(response);
 		}
 
