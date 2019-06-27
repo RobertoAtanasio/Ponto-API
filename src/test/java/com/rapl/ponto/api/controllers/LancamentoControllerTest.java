@@ -3,8 +3,8 @@ package com.rapl.ponto.api.controllers;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import org.junit.Test;
@@ -36,7 +36,7 @@ import com.rapl.ponto.api.services.LancamentoService;
 @AutoConfigureMockMvc		// contexto web
 @ActiveProfiles("test")
 public class LancamentoControllerTest {
-
+	
 	@Autowired
 	private MockMvc mvc;
 	
@@ -50,17 +50,21 @@ public class LancamentoControllerTest {
 	private static final Long ID_FUNCIONARIO = 1L;
 	private static final Long ID_LANCAMENTO = 1L;
 	private static final String TIPO = TipoEnum.INICIO_TRABALHO.name();
+	private static final String DESCRICAO = "LANÇAMENTO"; 
 	private static final LocalDateTime DATA = LocalDateTime.now();
+	private static final String LOCALIZACAO = "1.12345,2.24562";
 	
-	private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	
+//	private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		
 	@Test
 	@WithMockUser
 	public void testCadastrarLancamento() throws Exception {
+		
 		Lancamento lancamento = obterDadosLancamento();
 		BDDMockito.given(this.funcionarioService.buscarPorId(Mockito.anyLong())).willReturn(Optional.of(new Funcionario()));
 		BDDMockito.given(this.lancamentoService.persistir(Mockito.any(Lancamento.class))).willReturn(lancamento);
-
+	
 		mvc.perform(MockMvcRequestBuilders.post(URL_BASE)
 				.content(this.obterJsonRequisicaoPost())
 				.contentType(MediaType.APPLICATION_JSON)
@@ -68,9 +72,24 @@ public class LancamentoControllerTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.data.id").value(ID_LANCAMENTO))
 				.andExpect(jsonPath("$.data.tipo").value(TIPO))
-				.andExpect(jsonPath("$.data.data").value(this.dateFormat.format(DATA)))
+				.andExpect(jsonPath("$.data.descricao").value(DESCRICAO))
+				.andExpect(jsonPath("$.data.data").value(DATA.format(dateFormat)))
 				.andExpect(jsonPath("$.data.funcionarioId").value(ID_FUNCIONARIO))
 				.andExpect(jsonPath("$.errors").isEmpty());
+		/*
+		 * Modelo do JSON esperado pela API
+		 {
+		    "data": {
+		        "id": 3,
+		        "data": "2019-06-26 21:30:00",
+		        "tipo": "TERMINO_TRABALHO",
+		        "descricao": "Término de trabalho",
+		        "localizacao": "1.12345,2.24562",
+		        "funcionarioId": 9
+		    },
+		    "errors": []
+		}
+		 */
 	}
 	
 	@Test
@@ -100,18 +119,20 @@ public class LancamentoControllerTest {
 	@Test
 	@WithMockUser
 	public void testRemoverLancamentoAcessoNegado() throws Exception {
-		BDDMockito.given(this.lancamentoService.buscarPorId(Mockito.anyLong())).willReturn(Optional.of(new Lancamento()));
+		BDDMockito.given(this.lancamentoService.buscarPorId(Mockito.anyLong())).willReturn(Optional.empty());
 
 		mvc.perform(MockMvcRequestBuilders.delete(URL_BASE + ID_LANCAMENTO)
 				.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isForbidden());
+				.andExpect(status().isBadRequest());
 	}
 
 	private String obterJsonRequisicaoPost() throws JsonProcessingException {
 		LancamentoDto lancamentoDto = new LancamentoDto();
 		lancamentoDto.setId(null);
-		lancamentoDto.setData(this.dateFormat.format(DATA));
+		lancamentoDto.setData(DATA.format(dateFormat));
 		lancamentoDto.setTipo(TIPO);
+		lancamentoDto.setDescricao(DESCRICAO);
+		lancamentoDto.setLocalizacao(LOCALIZACAO);
 		lancamentoDto.setFuncionarioId(ID_FUNCIONARIO);
 		ObjectMapper mapper = new ObjectMapper();
 		return mapper.writeValueAsString(lancamentoDto);
@@ -122,6 +143,8 @@ public class LancamentoControllerTest {
 		lancamento.setId(ID_LANCAMENTO);
 		lancamento.setData(DATA);
 		lancamento.setTipo(TipoEnum.valueOf(TIPO));
+		lancamento.setDescricao(DESCRICAO);
+		lancamento.setLocalizacao(LOCALIZACAO);
 		lancamento.setFuncionario(new Funcionario());
 		lancamento.getFuncionario().setId(ID_FUNCIONARIO);
 		return lancamento;
