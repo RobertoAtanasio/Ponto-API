@@ -119,13 +119,13 @@ public class LancamentoControllerTest {
 	@Test
 	@WithMockUser
 	public void testRemoverLancamentoAcessoNegado() throws Exception {
-		BDDMockito.given(this.lancamentoService.buscarPorId(Mockito.anyLong())).willReturn(Optional.empty());
+		BDDMockito.given(this.lancamentoService.buscarPorId(Mockito.anyLong())).willReturn(Optional.of(new Lancamento()));
 
 		mvc.perform(MockMvcRequestBuilders.delete(URL_BASE + ID_LANCAMENTO)
 				.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isBadRequest());
+				.andExpect(status().isForbidden());
 	}
-
+	
 	private String obterJsonRequisicaoPost() throws JsonProcessingException {
 		LancamentoDto lancamentoDto = new LancamentoDto();
 		lancamentoDto.setId(null);
