@@ -31,9 +31,10 @@ public class SwaggerConfig {
 	private UserDetailsService userDetailsService;
 
 	@Bean
-	public Docket api() {
+	public Docket api() {		
 		return new Docket(DocumentationType.SWAGGER_2).select()
 				.apis(RequestHandlerSelectors.basePackage("com.rapl.ponto.api.controllers"))
+//				.apis(RequestHandlerSelectors.basePackage("com.rapl.ponto.api.security.controllers"))
 				.paths(PathSelectors.any()).build()
 				.apiInfo(apiInfo());
 	}
@@ -53,7 +54,6 @@ public class SwaggerConfig {
 		} catch (Exception e) {
 			token = "";
 		}
-
 		return new SecurityConfiguration(null, null, null, null, "Bearer " + token, ApiKeyVehicle.HEADER,
 				"Authorization", ",");
 	}
