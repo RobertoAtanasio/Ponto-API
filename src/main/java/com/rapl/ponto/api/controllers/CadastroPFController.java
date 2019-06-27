@@ -27,12 +27,16 @@ import com.rapl.ponto.api.services.EmpresaService;
 import com.rapl.ponto.api.services.FuncionarioService;
 import com.rapl.ponto.api.utils.PasswordUtils;
 
+// http://localhost:8080/v2/api-docs		obs.: Gera um objeto JSON que no Browser FireFox fica melhor visualizado
+
+// http://localhost:8080/swagger-ui.html	Visualiza no browser a documentação (ler o JSON acima definido)
+
 @RestController
 @RequestMapping("/api/cadastrar-pf")
 @CrossOrigin(origins = "*")
 public class CadastroPFController {
 
-private static final Logger log = LoggerFactory.getLogger(CadastroPFController.class);
+	private static final Logger log = LoggerFactory.getLogger(CadastroPFController.class);
 	
 	@Autowired
 	private EmpresaService empresaService;
