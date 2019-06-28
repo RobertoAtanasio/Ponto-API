@@ -11,8 +11,9 @@
 	<groupId>com.rapl.ponto-api</groupId>
 	<artifactId>ponto-api</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>ponto-api</name>
-	<description>Projeto Ponto Inteligente - REST - Sring Boot</description>
+	<description>Projeto Ponto - REST - Sring Boot</description>
 
 	<properties>
 		<java.version>1.8</java.version>
