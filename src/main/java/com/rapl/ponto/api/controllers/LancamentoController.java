@@ -121,13 +121,18 @@ public class LancamentoController {
 		log.info("Adicionando lançamento: {}", lancamentoDto.toString());
 		Response<LancamentoDto> response = new Response<LancamentoDto>();
 		validarFuncionario(lancamentoDto, result);
+		
+		log.info("converterDtoParaLancamento: {}", lancamentoDto.toString());
 		Lancamento lancamento = this.converterDtoParaLancamento(lancamentoDto, result);
+		log.info("Após converterDtoParaLancamento: {}", lancamentoDto.toString());
 
 		if (result.hasErrors()) {
 			log.error("Erro validando lançamento: {}", result.getAllErrors());
 			result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
 			return ResponseEntity.badRequest().body(response);
 		}
+		
+		log.info("Persistindo lançamento: {}", lancamentoDto.toString());
 
 		lancamento = this.lancamentoService.persistir(lancamento);
 		response.setData(this.converterLancamentoDto(lancamento));
@@ -215,9 +220,14 @@ public class LancamentoController {
 	 * @return LancamentoDto
 	 */
 	private LancamentoDto converterLancamentoDto(Lancamento lancamento) {
+		
+		
+//		System.out.println(">>> lancamento.getData():" + this.dateFormat.format(lancamento.getData()));
+		
+		
 		LancamentoDto lancamentoDto = new LancamentoDto();
 		lancamentoDto.setId(Optional.of(lancamento.getId()));
-		lancamentoDto.setData(this.dateFormat.format(lancamento.getData()));
+		lancamentoDto.setData(this.dateFormat.format(lancamento.getData())); // de LocalDateTime para String
 		lancamentoDto.setTipo(lancamento.getTipo().toString());
 		lancamentoDto.setDescricao(lancamento.getDescricao());
 		lancamentoDto.setLocalizacao(lancamento.getLocalizacao());
@@ -253,8 +263,9 @@ public class LancamentoController {
 		lancamento.setDescricao(lancamentoDto.getDescricao());
 		lancamento.setLocalizacao(lancamentoDto.getLocalizacao());
 		
-//		lancamento.setData(this.dateFormat.parse(lancamentoDto.getData()));
-		lancamento.setData(LocalDateTime.parse(lancamentoDto.getData(), dateFormat));
+        LocalDateTime localDateTime = LocalDateTime.parse(lancamentoDto.getData(), dateFormat);
+		
+		lancamento.setData(localDateTime);	// de String para LocalDateTime
 	
 		// EnumUtils: ver dependência commons-lang3 no pom.xml
 		if (EnumUtils.isValidEnum(TipoEnum.class, lancamentoDto.getTipo())) {

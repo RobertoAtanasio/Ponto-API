@@ -64,7 +64,7 @@ public class LancamentoControllerTest {
 		Lancamento lancamento = obterDadosLancamento();
 		BDDMockito.given(this.funcionarioService.buscarPorId(Mockito.anyLong())).willReturn(Optional.of(new Funcionario()));
 		BDDMockito.given(this.lancamentoService.persistir(Mockito.any(Lancamento.class))).willReturn(lancamento);
-	
+		
 		mvc.perform(MockMvcRequestBuilders.post(URL_BASE)
 				.content(this.obterJsonRequisicaoPost())
 				.contentType(MediaType.APPLICATION_JSON)
@@ -74,6 +74,7 @@ public class LancamentoControllerTest {
 				.andExpect(jsonPath("$.data.tipo").value(TIPO))
 				.andExpect(jsonPath("$.data.descricao").value(DESCRICAO))
 				.andExpect(jsonPath("$.data.data").value(DATA.format(dateFormat)))
+				.andExpect(jsonPath("$.data.localizacao").value(LOCALIZACAO))
 				.andExpect(jsonPath("$.data.funcionarioId").value(ID_FUNCIONARIO))
 				.andExpect(jsonPath("$.errors").isEmpty());
 		/*

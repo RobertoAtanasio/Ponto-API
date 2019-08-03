@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-// O Spring Security depende de um usuário que implemente a interface UserDetails, poi é através desses dados 
+// O Spring Security depende de um usuário que implemente a interface UserDetails, pois é através desses dados 
 // que ele controlará quem está autenticando o sistema.
 
 public class JwtUser implements UserDetails {
